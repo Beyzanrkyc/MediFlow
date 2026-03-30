@@ -44,6 +44,8 @@ MediFlow AI addresses these challenges through:
 * Patient Load Analytics
 * Clinical Audit Trail
 
+![Dashbord](dasbord_design.png)
+
 ## 🏗️ Project Structure
 
 ```bash
