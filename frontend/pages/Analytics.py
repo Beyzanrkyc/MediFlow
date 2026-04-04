@@ -95,7 +95,7 @@ def _analytics_charts():
         fig2.update_layout(
             height=260, margin=dict(l=10, r=10, t=10, b=30),
             paper_bgcolor="white", plot_bgcolor="white",
-            yaxis=dict(title="Rate (%)", showgrid=True, gridcolor="#eee"),
+            yaxis=dict(title="Rate (%)", showgrid=True, gridcolor="black"),
             xaxis=dict(showgrid=False),
         )
         st.plotly_chart(fig2, width="stretch", config={"displayModeBar": False})

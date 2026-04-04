@@ -1,17 +1,12 @@
-from openai import OpenAI
-from dotenv import load_dotenv
-import os
+from sentence_transformers import SentenceTransformer
 
-# 👇 ADD THIS LINE
-load_dotenv()
-print("KEY:", os.getenv("OPENAI_API_KEY"))
+# Load model once (downloads on first run)
+model = SentenceTransformer("all-MiniLM-L6-v2")
 
-# 👇 this will now read from .env
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-def get_embedding(text):
-    response = client.embeddings.create(
-        model="text-embedding-3-small",
-        input=text
-    )
-    return response.data[0].embedding
+def get_embedding(text: str):
+    """
+    Generate embedding for a given text using a local model.
+    Returns a list (compatible with ChromaDB).
+    """
+    return model.encode(text).tolist()
