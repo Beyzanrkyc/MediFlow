@@ -34,12 +34,12 @@ def _triage(text: str):
 def render():
     _nhs_logo()
 
-    # ✅ Session state init
+    # ✅ SESSION STATE
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
-    if "sources" not in st.session_state:
-        st.session_state.sources = []
+    if "audit" not in st.session_state:
+        st.session_state.audit = None
 
     if "triage_done" not in st.session_state:
         st.session_state.triage_done = False
@@ -49,7 +49,7 @@ def render():
 
     col_chat, col_insight = st.columns([1.1, 0.9], gap="medium")
 
-    # ── CHAT PANEL ─────────────────────────────────────────────
+    # ── CHAT ─────────────────────────────────────────────
     with col_chat:
         st.markdown("<div class='nhs-card'>", unsafe_allow_html=True)
 
@@ -62,25 +62,27 @@ def render():
                 )
             else:
                 st.markdown(f"""
-                <div style='display:flex;align-items:flex-start;gap:0.5rem;margin-bottom:0.5rem'>
-                    <div style='font-size:1.5rem'>🩺</div>
+                <div style='display:flex;gap:0.5rem'>
+                    <div>🩺</div>
                     <div class='chat-bubble-ai'>{msg['content']}</div>
                 </div>
                 """, unsafe_allow_html=True)
 
-        symptom_input = st.text_input(
-            "Symptoms",
-            placeholder="Describe your symptoms…",
-            label_visibility="collapsed",
-            key="symptom_box",
-        )
+        # 🔥 FORM (ENTER + BUTTON SUPPORT)
+        with st.form(key="chat_form", clear_on_submit=True):
 
-        send = st.button("Send", type="primary")
+            symptom_input = st.text_input(
+                "Symptoms",
+                placeholder="Describe your symptoms…",
+                label_visibility="collapsed",
+                key="symptom_box"
+            )
 
-        # 🔥 SEND MESSAGE
+            send = st.form_submit_button("Send")
+
+        # 🚀 HANDLE SEND
         if send and symptom_input.strip():
 
-            # Save user message
             st.session_state.messages.append(
                 {"role": "user", "content": symptom_input}
             )
@@ -89,9 +91,8 @@ def render():
 
             full_response = ""
 
-            # 🔥 STREAMING RESPONSE
             with st.chat_message("assistant"):
-                message_placeholder = st.empty()
+                placeholder = st.empty()
 
                 try:
                     response = requests.post(
@@ -104,21 +105,26 @@ def render():
                         if chunk:
                             text = chunk.decode("utf-8")
                             full_response += text
-                            message_placeholder.markdown(full_response)
+                            placeholder.markdown(full_response)
 
                 except Exception:
                     full_response = "⚠️ Backend not reachable."
 
-            # 🚨 TRIAGE SAFETY LAYER
+            # TRIAGE
             if level == "URGENT":
                 full_response = "⚠️ **URGENT: Go to A&E immediately.**\n\n" + full_response
             elif level == "LOW":
                 full_response = "🟢 **Low risk: Monitor symptoms.**\n\n" + full_response
 
-            # Save assistant response
             st.session_state.messages.append(
                 {"role": "assistant", "content": full_response}
             )
+
+            # 🔥 SAVE AUDIT DATA
+            st.session_state.audit = {
+                "query": symptom_input,
+                "note": "Streaming mode currently does not return sources yet",
+            }
 
             st.session_state.triage_done = level is not None
             st.session_state.triage_level = level
@@ -127,55 +133,41 @@ def render():
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # ── CLINICAL INSIGHTS ─────────────────────────────────────
+    # ── INSIGHTS ─────────────────────────────────────────
     with col_insight:
-        st.markdown("**Clinical Insights**")
+        st.markdown("## Clinical Insights")
 
-        # ⚠️ NOTE: Streaming endpoint doesn't return sources
-        # (You can upgrade this later if needed)
-        if st.session_state.sources:
-            st.markdown(
-                "<span class='badge-red'>Retrieved Guidelines</span>",
-                unsafe_allow_html=True,
-            )
+        # Audit Trail
+        if st.session_state.audit:
+            audit = st.session_state.audit
 
-            for src in st.session_state.sources:
-                st.markdown(f"""
-                <div class='nhs-card' style='margin-top:0.5rem'>
-                    <b>{src}</b><br>
-                    <small style='color:var(--nhs-grey)'>Source</small>
-                </div>
-                """, unsafe_allow_html=True)
-        else:
-            st.info("Streaming mode active — sources not shown yet.")
+            st.markdown("### Clinical Audit Trail")
 
-        # Triage result UI
+            st.markdown(f"""
+            <div class='audit-section'>
+                <h5>Patient Input</h5>
+                <p>{audit['query']}</p>
+            </div>
+            """, unsafe_allow_html=True)
+
+            st.info("Next step: connect backend sources here 🔥")
+
+        # Triage Panel
         if st.session_state.triage_done:
             if st.session_state.triage_level == "URGENT":
                 st.markdown("""
                 <div class='triage-urgent'>
-                    <span class='badge-red'>Triage Result</span>
-                    <h3>● URGENT — Go to A&E</h3>
-                    <p>Possible serious condition detected.</p>
+                    <h3>URGENT — Go to A&E</h3>
                 </div>
                 """, unsafe_allow_html=True)
             else:
-                st.markdown("""
-                <div style='background:var(--nhs-green);color:white;border-radius:6px;
-                            padding:1rem 1.25rem;margin-top:0.75rem'>
-                    <b>Triage Result</b>
-                    <h3 style='color:white;margin:0.25rem 0'>● LOW RISK</h3>
-                    <p style='color:white;margin:0;font-size:0.9rem'>
-                        Monitor symptoms and contact GP if needed.
-                    </p>
-                </div>
-                """, unsafe_allow_html=True)
+                st.success("LOW RISK — Monitor symptoms")
 
-            if st.button("🔄 Clear & Start Again"):
+            if st.button("🔄 Reset"):
                 st.session_state.messages = []
-                st.session_state.sources = []
+                st.session_state.audit = None
                 st.session_state.triage_done = False
                 st.session_state.triage_level = None
                 st.rerun()
         else:
-            st.info("Complete the symptom assessment to receive a triage result.")
+            st.info("Enter symptoms to begin triage.")

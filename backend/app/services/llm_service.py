@@ -9,25 +9,51 @@ USE_LOCAL = False  # set True if using Ollama
 if not USE_LOCAL:
     client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-def generate_answer(query, context_chunks):
-    context = "\n\n".join(context_chunks)
 
-    prompt = f"""
-You are a cautious NHS medical assistant.
+# 🔥 NEW NHS SAFE PROMPT FUNCTION
+def build_prompt(query, context):
+    return f"""
+You are an NHS AI Symptom Checker.
 
-Rules:
-- Do NOT diagnose
-- Be safe and conservative
-- Recommend professional care if needed
+STRICT RULES:
+- You are NOT a doctor
+- You do NOT provide diagnosis
+- You do NOT act like you are physically with the patient
+- You do NOT give clinical procedures (NO "I will check", NO "lie down", etc.)
+- You ONLY provide general guidance based on NHS advice
 
-Context:
+YOUR ROLE:
+1. Ask relevant follow-up questions about symptoms
+2. Assess risk level:
+   - LOW: mild symptoms → self-care or GP
+   - URGENT: serious symptoms → advise going to A&E
+3. Be cautious and safety-focused
+
+STYLE:
+- Clear, calm, short
+- Simple language
+- No hospital roleplay
+
+CONTEXT (NHS GUIDELINES):
 {context}
 
-User:
+USER INPUT:
 {query}
 
-Answer:
+RESPONSE FORMAT:
+- Start with a short assessment
+- Ask 1–3 follow-up questions
+- End with:
+
+Triage Level: LOW or URGENT
+
+ANSWER:
 """
+
+
+def generate_answer(query, context_chunks):
+    context = "\n\n".join(context_chunks)
+    prompt = build_prompt(query, context)
 
     if USE_LOCAL:
         import ollama
@@ -40,26 +66,16 @@ Answer:
 
     else:
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",  # ✅ WORKING MODEL
+            model="llama-3.1-8b-instant",  # ✅ working model
             messages=[{"role": "user", "content": prompt}],
         )
 
         return response.choices[0].message.content
 
+
 def stream_answer(query, context_chunks):
     context = "\n\n".join(context_chunks)
-
-    prompt = f"""
-You are a cautious NHS medical assistant.
-
-Context:
-{context}
-
-User:
-{query}
-
-Answer:
-"""
+    prompt = build_prompt(query, context)
 
     if USE_LOCAL:
         import ollama
@@ -76,7 +92,7 @@ Answer:
     else:
         try:
             stream = client.chat.completions.create(
-                model="llama-3.1-8b-instant",  # ✅ WORKING MODEL
+                model="llama-3.1-8b-instant",  # ✅ working model
                 messages=[{"role": "user", "content": prompt}],
                 stream=True
             )
