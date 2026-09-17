@@ -45,6 +45,7 @@ MediFlow AI addresses these challenges through:
 * Clinical Audit Trail
 
 ![Dashbord](1.png)
+![Dashbord](5.png)
 ![Dashbord](2.png)
 ![Dashbord](3.png)
 ![Dashbord](4.png)
