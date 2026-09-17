@@ -5,11 +5,13 @@ from frontend.pages.Dashboard    import render as render_dashboard
 from frontend.pages.Analytics    import render as render_analytics
 
 
+# ── Page Configuration ────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="MediFlow",
     layout="wide",
-    initial_sidebar_state="auto",
+    initial_sidebar_state="expanded",
 )
+
 
 # ── Global CSS ────────────────────────────────────────────────────────────────
 st.markdown("""
@@ -19,23 +21,41 @@ st.markdown("""
 html, body, [class*="css"] {
     font-family: 'Fira Sans', sans-serif;
 }
+
 :root {
-    --nhs-blue:   #005EB8;
-    --nhs-dark:   #003087;
-    --nhs-red:    #DA291C;
-    --nhs-green:  #007F3B;
-    --nhs-grey:   #768692;
-}
-            
-section[data-testid="stSidebar"] { 
-    background: var(--nhs-blue) !important; 
-}
-             
-section[data-testid="stSidebar"] * { 
-    color: white !important; 
+    --nhs-blue: #005EB8;
+    --nhs-dark: #003087;
+    --nhs-red: #DA291C;
+    --nhs-green: #007F3B;
+    --nhs-grey: #768692;
 }
 
-#MainMenu, footer, header { visibility: hidden; }
+
+/* ── Sidebar ─────────────────────────────────────────────────────────────── */
+
+section[data-testid="stSidebar"] {
+    background: var(--nhs-blue) !important;
+}
+
+/* Keep sidebar visible */
+section[data-testid="stSidebar"][aria-expanded="false"] {
+    display: block !important;
+    width: 21rem !important;
+    min-width: 21rem !important;
+    transform: none !important;
+}
+
+/* Sidebar content */
+section[data-testid="stSidebar"] > div {
+    background: var(--nhs-blue) !important;
+}
+
+section[data-testid="stSidebar"] * {
+    color: white !important;
+}
+
+
+/* ── Sidebar navigation ─────────────────────────────────────────────────── */
 
 div[role="radiogroup"] label > div:first-child {
     display: none !important;
@@ -61,6 +81,9 @@ div[role="radiogroup"] label[data-checked="true"] {
     border-left: 3px solid white;
 }
 
+
+/* ── NHS Logo ───────────────────────────────────────────────────────────── */
+
 .nhs-logo-box {
     background: var(--nhs-blue);
     color: white;
@@ -73,30 +96,50 @@ div[role="radiogroup"] label[data-checked="true"] {
     margin-right: 6px;
 }
 
+
+/* ── Chat bubbles ───────────────────────────────────────────────────────── */
+
 .chat-bubble-user {
-    background:#E8F0FE;
+    background: #E8F0FE;
     color: black;
-    border-radius:18px 18px 4px 18px;
-    padding:0.6rem 1rem; 
-    max-width:80%;
-    margin-left:auto; 
-    margin-bottom:0.5rem; 
+    border-radius: 18px 18px 4px 18px;
+    padding: 0.6rem 1rem;
+    max-width: 80%;
+    margin-left: auto;
+    margin-bottom: 0.5rem;
 }
-            
+
 .chat-bubble-ai {
-    background:white; 
+    background: white;
     color: black;
-    border:1px solid #ddd;
-    border-radius:18px 18px 18px 4px;
-    padding:0.6rem 1rem; 
-    max-width:85%; 
-    margin-bottom:0.5rem; 
+    border: 1px solid #ddd;
+    border-radius: 18px 18px 18px 4px;
+    padding: 0.6rem 1rem;
+    max-width: 85%;
+    margin-bottom: 0.5rem;
+}
+
+
+/* ── Hide Streamlit default UI ──────────────────────────────────────────── */
+
+#MainMenu {
+    visibility: hidden;
+}
+
+footer {
+    visibility: hidden;
+}
+
+header {
+    visibility: hidden;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
+
 # ── Session State ─────────────────────────────────────────────────────────────
+
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
@@ -109,7 +152,9 @@ if "triage_level" not in st.session_state:
 if "active_page" not in st.session_state:
     st.session_state.active_page = "patients"
 
+
 # ── Sidebar ───────────────────────────────────────────────────────────────────
+
 with st.sidebar:
 
     # Logo
@@ -120,6 +165,8 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
+
+    # Navigation options
     options = [
         "💬 Symptom Checker",
         "📅 Appointments",
@@ -127,6 +174,8 @@ with st.sidebar:
         "📈 Analytics",
     ]
 
+
+    # Page mapping
     mapping = {
         "💬 Symptom Checker": "patients",
         "📅 Appointments": "appointments",
@@ -134,24 +183,40 @@ with st.sidebar:
         "📈 Analytics": "analytics",
     }
 
-    reverse_mapping = {v: k for k, v in mapping.items()}
 
+    # Reverse mapping
+    reverse_mapping = {
+        v: k for k, v in mapping.items()
+    }
+
+
+    # Navigation radio buttons
     selected = st.radio(
         "Navigation",
         options,
-        index=options.index(reverse_mapping[st.session_state.active_page])
+        index=options.index(
+            reverse_mapping[st.session_state.active_page]
+        )
     )
 
+
+    # Update active page
     st.session_state.active_page = mapping[selected]
 
+
 # ── Routing ───────────────────────────────────────────────────────────────────
+
 page = st.session_state.active_page
+
 
 if page == "patients":
     render_patients()
+
 elif page == "appointments":
     render_appointments()
+
 elif page == "dashboard":
     render_dashboard()
+
 elif page == "analytics":
     render_analytics()
