@@ -1,19 +1,19 @@
-# 🏥 MediFlow AI
+#  MediFlow AI
 
 ### Intelligent NHS Triage & Healthcare Optimization Platform
 
-## 📌 Overview
+##  Overview
 
 **MediFlow AI** is an AI-powered healthcare platform designed to reduce pressure on the NHS by combining:
 
-* 🧠 Large Language Models (LLMs)
-* 🔍 Retrieval-Augmented Generation (RAG)
-* 🧬 Vector Databases
-* 📊 Real-time hospital analytics
+* Large Language Models (LLMs)
+* Retrieval-Augmented Generation (RAG)
+* Vector Databases
+* Real-time hospital analytics
 
 The system provides **automated patient triage**, **smart appointment scheduling**, and **capacity optimization across hospitals**, helping reduce waiting times and improve patient outcomes.
 
-## 🎯 Problem Statement
+##  Problem Statement
 
 Healthcare systems face:
 
@@ -22,20 +22,20 @@ Healthcare systems face:
 * Staff shortages
 * High no-show appointment rates
 
-## 💡 Solution
+##  Solution
 
 MediFlow AI addresses these challenges through:
 
-* 🤖 AI Symptom Checker
-* 📚 RAG-based clinical reasoning
-* 📅 Smart scheduling
-* ⚠️ No-show prediction
-* 🏥 Hospital load balancing
-* 📊 Explainable AI audit trail
+*  AI Symptom Checker
+*  RAG-based clinical reasoning
+*  Smart scheduling
+*  No-show prediction
+*  Hospital load balancing
+*  Explainable AI audit trail
 
 
 
-## 🖥️ Dashboard Features
+##  Dashboard Features
 
 * AI Chat Interface
 * Triage Results Panel
@@ -49,7 +49,7 @@ MediFlow AI addresses these challenges through:
 ![Dashbord](3.png)
 ![Dashbord](4.png)
 
-## 🏗️ Project Structure
+##  Project Structure
 
 ```bash
 MediFlow/
@@ -104,7 +104,7 @@ MediFlow/
 ```
 
 
-## 🏗️ System Architecture
+##  System Architecture
 
 ### Frontend
 
@@ -126,7 +126,7 @@ MediFlow/
 * Structured data: PostgreSQL via SQLAlchemy (patients, appointments, hospitals, triage session log)
 
 
-## 🔄 RAG Pipeline
+##  RAG Pipeline
 
 1. Data ingestion (NHS guidelines)
 2. Chunking text
@@ -135,7 +135,7 @@ MediFlow/
 5. Retrieving relevant context
 6. LLM generates response
 
-## 🚀 Example Flow
+##  Example Flow
 
 1. User enters symptoms:
 
@@ -148,7 +148,7 @@ MediFlow/
 
 3. Output:
 
-   * 🚨 **URGENT: Go to A&E**
+   *  **URGENT: Go to A&E**
    * Explanation based on retrieved data
 
 4. Dashboard:
@@ -161,7 +161,7 @@ MediFlow/
    * Shows reasoning and source guidelines
 
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 | Layer      | Technology                                  |
 | ---------- | -------------------------------------------- |
@@ -173,7 +173,7 @@ MediFlow/
 | Vector DB  | ChromaDB (local, persistent)                 |
 | Database   | PostgreSQL (SQLAlchemy ORM)                  |
 
-## 🗺️ Roadmap
+##  Roadmap
 
 * [x] MVP chatbot (symptom checker, streaming + non-streaming)
 * [x] RAG integration (ChromaDB + sentence-transformers + Groq)
@@ -186,7 +186,7 @@ MediFlow/
 * [ ] Final UI polish
 
 
-## 🏆 Key Highlights
+##  Key Highlights
 
 * Uses **RAG + Vector DB**
 * Real-world healthcare impact
@@ -195,7 +195,7 @@ MediFlow/
 * Strong UI dashboard
 
 
-## 📢 Conclusion
+##  Conclusion
 
 MediFlow AI demonstrates how AI-powered systems can:
 
