@@ -1,0 +1,17 @@
+# Environment / secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+venv/
+*.egg-info/
+
+# ChromaDB local store
+backend/chroma_db/
+
+# Downloaded/cached guideline PDFs
+backend/data/nhs_guidelines/*.pdf
+
+# Streamlit
+.streamlit/
